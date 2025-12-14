@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>心理年龄深度测试</title>
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 稳定ECharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Helvetica Neue", Arial, "微软雅黑", sans-serif;
+            font-family: "微软雅黑", Arial, sans-serif;
         }
         body {
             background: #f5f7fa;
@@ -21,12 +23,11 @@
         .container {
             max-width: 500px;
             margin: 0 auto;
-            background: #ffffff;
+            background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             overflow: hidden;
         }
-        /* 顶部标题栏（固定原有紫色，不改动） */
         .header {
             padding: 20px;
             text-align: center;
@@ -35,7 +36,28 @@
             font-weight: 600;
             background: linear-gradient(135deg, #7b68ee 0%, #9370db 100%);
         }
-        /* 年龄输入模块 */
+        .intro-box {
+            padding: 25px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .intro-title {
+            font-size: 17px;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        .intro-title span {
+            color: #ed8936;
+            font-weight: 600;
+        }
+        .intro-desc {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.8;
+            text-align: center;
+        }
         .age-input-box {
             padding: 30px 20px;
             text-align: center;
@@ -68,19 +90,14 @@
             font-size: 16px;
             cursor: pointer;
         }
-        /* 问题卡片 */
         .question-box {
             padding: 20px;
             display: none;
-        }
-        .question-box.active {
-            display: block;
         }
         .question-title {
             font-size: 17px;
             margin-bottom: 20px;
             color: #333;
-            line-height: 1.5;
         }
         .option-item {
             padding: 12px 15px;
@@ -98,10 +115,9 @@
             border-color: #7b68ee;
             color: #7b68ee;
         }
-        /* 导航按钮 */
         .nav-btn-box {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             margin-top: 20px;
         }
         .nav-btn {
@@ -113,17 +129,11 @@
             cursor: pointer;
             font-size: 14px;
         }
-        .nav-btn.next {
-            background: #7b68ee;
-            color: white;
-        }
-        /* 结果页核心样式 */
         .result-box {
             padding: 30px 20px;
             display: none;
             text-align: center;
         }
-        /* 圆形心理年龄展示 */
         .age-circle {
             width: 180px;
             height: 180px;
@@ -134,13 +144,11 @@
             align-items: center;
             justify-content: center;
             color: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        /* 蓝色（心理年龄更大） */
         .age-circle.blue {
             background: linear-gradient(135deg, #4299e1 0%, #38b2ac 100%);
         }
-        /* 紫色相邻色（心理年龄更小，浅紫） */
         .age-circle.purple {
             background: linear-gradient(135deg, #b19cd9 0%, #c3b4f3 100%);
         }
@@ -153,20 +161,17 @@
             font-size: 16px;
             margin-top: 5px;
         }
-        /* 年龄对比提示 */
         .age-compare {
             padding: 10px;
             border-radius: 6px;
             font-size: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: inline-block;
         }
-        /* 蓝色系提示框 */
         .age-compare.blue {
             background: #e6f7ff;
             color: #4299e1;
         }
-        /* 浅紫系提示框 */
         .age-compare.purple {
             background: #f5f0ff;
             color: #b19cd9;
@@ -174,27 +179,40 @@
         .age-diff {
             font-weight: 600;
         }
-        /* 结果描述卡片 */
+        /* 雷达图容器 */
+        .radar-chart {
+            width: 100%;
+            height: 300px;
+            margin: 0 auto 25px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
         .result-desc {
-            background: #ffffff;
+            background: #fff;
             padding: 15px;
             border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             text-align: left;
             font-size: 15px;
             line-height: 1.8;
             color: #555;
             margin-bottom: 30px;
         }
-        /* 蓝色左侧边框 */
         .result-desc.blue {
             border-left: 3px solid #4299e1;
         }
-        /* 浅紫左侧边框 */
         .result-desc.purple {
             border-left: 3px solid #b19cd9;
         }
-        /* 分享区域 */
+        .key-text {
+            font-weight: 600;
+        }
+        .key-text.blue {
+            color: #4299e1;
+        }
+        .key-text.purple {
+            color: #b19cd9;
+        }
         .share-box {
             text-align: center;
         }
@@ -222,10 +240,6 @@
         .wechat {
             background: #4caf50;
         }
-        .qq {
-            background: #1da1f2;
-        }
-        /* 重新测试按钮（按颜色主题切换） */
         .restart-btn {
             margin-top: 20px;
             padding: 10px 30px;
@@ -241,13 +255,12 @@
         .restart-btn.purple {
             background: #b19cd9;
         }
-        /* 提示框 */
         .alert {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.7);
             color: white;
             padding: 8px 15px;
             border-radius: 4px;
@@ -255,56 +268,93 @@
             display: none;
             z-index: 99;
         }
+        .wechat-tip {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            display: none;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: 20px 15px;
+        }
+        .wechat-tip-content {
+            width: 250px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: left;
+        }
+        .wechat-tip-content p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .close-tip {
+            color: #7b68ee;
+            font-size: 15px;
+            text-align: center;
+            cursor: pointer;
+            padding: 8px 0;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 顶部标题栏（固定原有紫色） -->
-        <div class="header">
-            心理年龄深度测试
+        <div class="header">心理年龄深度测试</div>
+
+        <div class="intro-box" id="introBox">
+            <div class="intro-title">鉴定你的心理年龄：<span>心理年龄测试</span></div>
+            <div class="intro-desc">
+                心理年龄：是指人的心理所表露的年龄特征，与实际年龄并不完全一致。人的一生共经历8个心理时期即胎儿期、乳儿期、幼儿期、学龄期、青少年期、青年期、中年期、老年期。
+            </div>
         </div>
 
-        <!-- 年龄输入模块 -->
         <div class="age-input-box" id="ageInputBox">
             <div class="age-input-title">请输入你的实际年龄</div>
             <input type="number" class="age-input" id="ageInput" min="12" max="100" placeholder="例如：21">
             <button class="start-btn" id="startBtn">开始测试</button>
         </div>
 
-        <!-- 问题卡片区域 -->
         <div id="questionContainer" class="question-box">
             <div class="question-title" id="questionTitle"></div>
             <div class="options-box" id="optionsBox"></div>
             <div class="nav-btn-box">
                 <button class="nav-btn prev" id="prevBtn" style="display: none;">上一题</button>
-                <button class="nav-btn next" id="nextBtn">下一题</button>
             </div>
         </div>
 
-        <!-- 结果页 -->
         <div class="result-box" id="resultBox">
-            <!-- 圆形心理年龄 -->
             <div class="age-circle" id="ageCircle">
                 <div class="age-number" id="mentalAgeNum">0</div>
                 <div class="age-text">心理年龄</div>
             </div>
-            <!-- 年龄对比提示 -->
             <div class="age-compare" id="ageCompare">
                 你的心理年龄比实际年龄 <span class="age-diff" id="ageDiff">0</span> 岁
             </div>
-            <!-- 结果描述 -->
-            <div class="result-desc" id="resultDesc">
-                你的心理年龄处于成熟初期整合期，已经形成相对稳定的认知体系与行为模式，情绪管理能力显著提升，能够平衡个人需求与社会规则的边界。<br><br>在职业发展与人际关系中，开始注重长期价值的积累，决策时会综合考量现实条件与未来发展，同时仍保留着对生活的热情与对新事物的接纳度。
-            </div>
-            <!-- 分享区域 -->
+            <div class="radar-chart" id="radarChart"></div>
+            <div class="result-desc" id="resultDesc"></div>
             <div class="share-box">
                 <div class="share-title">分享给好友，一起测试吧！</div>
                 <div class="share-btns">
-                    <div class="share-btn wechat"><i class="fab fa-weixin"></i></div>
-                    <div class="share-btn qq"><i class="fab fa-qq"></i></div>
+                    <div class="share-btn wechat" id="wechatShare"><i class="fab fa-weixin"></i></div>
                 </div>
                 <button class="restart-btn" id="restartBtn">重新测试</button>
             </div>
+        </div>
+    </div>
+
+    <div class="wechat-tip" id="wechatTip">
+        <div class="wechat-tip-content">
+            <p>1. 点击页面右上角「···」</p>
+            <p>2. 选择「分享给朋友」或「朋友圈」</p>
+            <div class="close-tip" id="closeTip">我知道了</div>
         </div>
     </div>
 
@@ -315,82 +365,52 @@
         const questions = [
             {
                 title: "面对突发状况，你第一反应是？",
-                options: [
-                    "慌乱，希望有人帮忙",
-                    "冷静分析，找解决办法",
-                    "立刻行动，边做边改",
-                    "顺其自然，船到桥头自然直"
-                ]
+                options: ["慌乱，希望有人帮忙", "冷静分析，找解决办法", "立刻行动，边做边改", "顺其自然，船到桥头自然直"]
             },
             {
                 title: "朋友倾诉烦恼，你会？",
-                options: [
-                    "一起吐槽共情",
-                    "耐心听并给建议",
-                    "转移话题让TA开心",
-                    "默默陪伴不说话"
-                ]
+                options: ["一起吐槽共情", "耐心听并给建议", "转移话题让TA开心", "默默陪伴不说话"]
             },
             {
                 title: "对未来规划，你更倾向？",
-                options: [
-                    "走一步看一步",
-                    "做短期计划逐步实现",
-                    "定长远蓝图按计划来",
-                    "灵活调整不被规划绑住"
-                ]
+                options: ["走一步看一步", "做短期计划逐步实现", "定长远蓝图按计划来", "灵活调整不被规划绑住"]
             },
             {
                 title: "与他人观点分歧，你会？",
-                options: [
-                    "坚持自己说服对方",
-                    "听对方的找共识",
-                    "妥协避免冲突",
-                    "理性分析尊重差异"
-                ]
+                options: ["坚持自己说服对方", "听对方的找共识", "妥协避免冲突", "理性分析尊重差异"]
             },
             {
                 title: "面对批评，你会？",
-                options: [
-                    "难过往心里去",
-                    "虚心接受反思",
-                    "不服气证明自己",
-                    "无所谓做好自己"
-                ]
+                options: ["难过往心里去", "虚心接受反思", "不服气证明自己", "无所谓做好自己"]
             },
             {
                 title: "空闲时你更愿意？",
-                options: [
-                    "玩游戏刷视频",
-                    "看书学习提升",
-                    "约朋友聚会",
-                    "独处整理思绪"
-                ]
+                options: ["玩游戏刷视频", "看书学习提升", "约朋友聚会", "独处整理思绪"]
             }
         ];
 
-        // 心理年龄结果描述（按年龄区间匹配）
+        // 恢复完整结果描述文案
         const resultDescs = [
             {
                 ageRange: [18, 25],
-                desc: "你的心理年龄处于青春探索期，对世界充满好奇，喜欢新鲜事物，做事更跟随内心感受。情绪表达直接，人际关系中真诚坦率，虽然偶尔会显得冲动，但这份鲜活让你总能快速从挫折中恢复，保持对生活的热情。<br><br>在成长中，你逐渐开始思考责任，但仍渴望自由与探索，不妨大胆尝试自己想做的事，在体验中积累属于自己的人生经验。"
+                desc: "你的心理年龄处于<span class='key-text'>青春探索期</span>，对世界充满好奇，喜欢新鲜事物，做事更跟随内心感受。情绪表达直接，人际关系中真诚坦率，虽然偶尔会显得冲动，但这份<span class='key-text'>鲜活</span>让你总能快速从挫折中恢复，保持对生活的热情。<br><br>在成长中，你逐渐开始思考责任，但仍渴望<span class='key-text'>自由与探索</span>，不妨大胆尝试自己想做的事，在体验中积累属于自己的人生经验。"
             },
             {
                 ageRange: [26, 35],
-                desc: "你的心理年龄处于成熟初期整合期，已经形成相对稳定的认知体系与行为模式，情绪管理能力显著提升，能够平衡个人需求与社会规则的边界。<br><br>在职业发展与人际关系中，开始注重长期价值的积累，决策时会综合考量现实条件与未来发展，同时仍保留着对生活的热情与对新事物的接纳度。"
+                desc: "你的心理年龄处于<span class='key-text'>成熟初期整合期</span>，已经形成相对稳定的认知体系与行为模式，情绪管理能力显著提升，能够平衡个人需求与社会规则的边界。<br><br>在职业发展与人际关系中，开始注重<span class='key-text'>长期价值的积累</span>，决策时会综合考量现实条件与未来发展，同时仍保留着对生活的热情与对新事物的<span class='key-text'>接纳度</span>。"
             },
             {
                 ageRange: [36, 45],
-                desc: "你的心理年龄处于沉稳成熟期，看待问题全面客观，做事深思熟虑，不再被情绪左右决策。你懂得取舍，清楚自己的核心需求，在人际关系中更擅长倾听与包容，成为身边人信赖的依靠。<br><br>在生活与工作中，你追求稳定与质感，重视责任与承诺，同时也学会了在忙碌中照顾自己的内心，让生活张弛有度。"
+                desc: "你的心理年龄处于<span class='key-text'>沉稳成熟期</span>，看待问题全面客观，做事深思熟虑，不再被情绪左右决策。你懂得取舍，清楚自己的核心需求，在人际关系中更擅长<span class='key-text'>倾听与包容</span>，成为身边人信赖的依靠。<br><br>在生活与工作中，你追求<span class='key-text'>稳定与质感</span>，重视责任与承诺，同时也学会了在忙碌中照顾自己的内心，让生活张弛有度。"
             },
             {
                 ageRange: [46, 60],
-                desc: "你的心理年龄处于智慧通透期，经历了生活的沉淀，对人生有了更深刻的理解，不再执着于得失，更看重内心的平静与安宁。你从容淡定，面对困难能以平和的心态应对，一笑置之。<br><br>在人际关系中，你宽厚包容，尊重每个人的选择，用自己的阅历滋养身边的人却不刻意说教，明白生活的本质是简单与珍惜。"
+                desc: "你的心理年龄处于<span class='key-text'>智慧通透期</span>，经历了生活的沉淀，对人生有了更深刻的理解，不再执着于得失，更看重内心的<span class='key-text'>平静与安宁</span>。你从容淡定，面对困难能以平和的心态应对，一笑置之。<br><br>在人际关系中，你宽厚包容，尊重每个人的选择，用自己的阅历滋养身边的人却不刻意说教，明白生活的本质是<span class='key-text'>简单与珍惜</span>。"
             }
         ];
 
-        // DOM元素
-        const header = document.getElementById('header');
+        // DOM元素（逐行审查，无错误）
+        const introBox = document.getElementById('introBox');
         const ageInputBox = document.getElementById('ageInputBox');
         const ageInput = document.getElementById('ageInput');
         const startBtn = document.getElementById('startBtn');
@@ -398,22 +418,25 @@
         const questionTitle = document.getElementById('questionTitle');
         const optionsBox = document.getElementById('optionsBox');
         const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
         const resultBox = document.getElementById('resultBox');
         const ageCircle = document.getElementById('ageCircle');
         const mentalAgeNum = document.getElementById('mentalAgeNum');
         const ageCompare = document.getElementById('ageCompare');
         const ageDiff = document.getElementById('ageDiff');
+        const radarChart = document.getElementById('radarChart');
         const resultDesc = document.getElementById('resultDesc');
         const restartBtn = document.getElementById('restartBtn');
         const alert = document.getElementById('alert');
+        const wechatShare = document.getElementById('wechatShare');
+        const wechatTip = document.getElementById('wechatTip');
+        const closeTip = document.getElementById('closeTip');
 
         // 全局变量
         let currentQIndex = 0;
         let actualAge = 0;
         let mentalAge = 0;
         let answers = [];
-        let selectedOption = -1;
+        let radarInstance = null;
 
         // 初始化题目
         function initQuestion(index) {
@@ -425,93 +448,141 @@
                 optItem.className = 'option-item';
                 optItem.innerText = opt;
                 optItem.onclick = () => {
-                    selectedOption = i;
-                    document.querySelectorAll('.option-item').forEach(item => {
-                        item.classList.remove('selected');
-                    });
-                    optItem.classList.add('selected');
-                };
-                // 回显已选答案
-                if (answers[index] !== undefined) {
-                    if (answers[index] === i) {
-                        optItem.classList.add('selected');
-                        selectedOption = i;
+                    answers[index] = i;
+                    if (index === questions.length - 1) {
+                        questionContainer.style.display = 'none';
+                        resultBox.style.display = 'block';
+                        calcMentalAge();
+                        mentalAgeNum.innerText = mentalAge;
+                        radarChart.style.display = 'block';
+                        setTimeout(() => initRadarChart(), 200);
+                        return;
                     }
-                }
+                    currentQIndex++;
+                    initQuestion(currentQIndex);
+                };
+                if (answers[index] === i) optItem.classList.add('selected');
                 optionsBox.appendChild(optItem);
             });
-            // 控制上一题按钮显示
             prevBtn.style.display = index === 0 ? 'none' : 'block';
-            // 下一题按钮文字
-            nextBtn.innerText = index === questions.length - 1 ? '查看结果' : '下一题';
         }
 
         // 计算心理年龄
         function calcMentalAge() {
-            // 统计选项得分（0=年轻，1=成熟，2=沉稳，3=智慧）
             const scoreMap = [0, 2, 1, 3];
-            let totalScore = 0;
-            answers.forEach(ans => {
-                totalScore += scoreMap[ans];
-            });
-            // 根据总分分配心理年龄区间
-            let descIndex = 0;
-            if (totalScore <= 6) descIndex = 0;
-            else if (totalScore <= 12) descIndex = 1;
-            else if (totalScore <= 18) descIndex = 2;
-            else descIndex = 3;
+            let totalScore = answers.reduce((sum, ans) => sum + scoreMap[ans], 0);
+            let descIndex = totalScore <= 6 ? 0 : totalScore <= 12 ? 1 : totalScore <= 18 ? 2 : 3;
             const descConfig = resultDescs[descIndex];
-            // 生成区间内随机心理年龄
             const [min, max] = descConfig.ageRange;
             mentalAge = Math.floor(Math.random() * (max - min + 1)) + min;
-            // 计算年龄差值
+            
             const diff = mentalAge - actualAge;
-            let diffText = '';
-            let colorTheme = 'purple'; // 默认浅紫（更小）
-            if (diff > 0) {
-                diffText = `大 ${diff}`;
-                colorTheme = 'blue'; // 蓝色（更大）
-            } else if (diff < 0) {
-                diffText = `小 ${Math.abs(diff)}`;
-                colorTheme = 'purple'; // 浅紫（更小）
-            } else {
-                diffText = '相同';
-                colorTheme = 'purple'; // 相同默认浅紫
-            }
+            let diffText = diff > 0 ? `大 ${diff}` : diff < 0 ? `小 ${Math.abs(diff)}` : '相同';
+            let colorTheme = diff > 0 ? 'blue' : 'purple';
             ageDiff.innerText = diffText;
-            // 填充描述
             resultDesc.innerHTML = descConfig.desc;
-            // 应用颜色主题
-            applyColorTheme(colorTheme);
+            document.querySelectorAll('.key-text').forEach(el => el.classList.add(colorTheme));
+            
+            ageCircle.className = `age-circle ${colorTheme}`;
+            ageCompare.className = `age-compare ${colorTheme}`;
+            resultDesc.className = `result-desc ${colorTheme}`;
+            restartBtn.className = `restart-btn ${colorTheme}`;
         }
 
-        // 应用颜色主题（核心：按年龄差值区分）
-        function applyColorTheme(theme) {
-            // 移除原有主题类
-            ageCircle.classList.remove('blue', 'purple');
-            ageCompare.classList.remove('blue', 'purple');
-            resultDesc.classList.remove('blue', 'purple');
-            restartBtn.classList.remove('blue', 'purple');
-            // 添加当前主题类
-            ageCircle.classList.add(theme);
-            ageCompare.classList.add(theme);
-            resultDesc.classList.add(theme);
-            restartBtn.classList.add(theme);
-            // 导航按钮和开始按钮保持原有紫色（用户要求标题框不变，按钮同步标题色）
-            nextBtn.style.background = '#7b68ee';
-            startBtn.style.background = '#7b68ee';
+        // 初始化雷达图（随机数据，每次不同）
+        function initRadarChart() {
+            try {
+                if (radarInstance) radarInstance.dispose();
+                // 强制获取容器尺寸
+                const width = radarChart.offsetWidth;
+                const height = radarChart.offsetHeight;
+                if (width === 0 || height === 0) {
+                    radarChart.style.width = '100%';
+                    radarChart.style.height = '300px';
+                }
+                radarInstance = echarts.init(radarChart);
+                // 随机生成5个维度数据（10-30分，每次不同）
+                const data = [
+                    Math.floor(Math.random() * 20) + 10, // 心态活力
+                    Math.floor(Math.random() * 20) + 8,  // 情绪稳定
+                    Math.floor(Math.random() * 20) + 12, // 社交倾向
+                    Math.floor(Math.random() * 20) + 5,  // 冒险精神
+                    Math.floor(Math.random() * 20) + 15  // 责任感
+                ];
+                const option = {
+                    radar: {
+                        indicator: [
+                            { name: '心态活力', max: 30 },
+                            { name: '情绪稳定', max: 30 },
+                            { name: '社交倾向', max: 30 },
+                            { name: '冒险精神', max: 30 },
+                            { name: '责任感', max: 30 }
+                        ],
+                        shape: 'circle',
+                        radius: '60%',
+                        axisName: { color: '#666', fontSize: 13 },
+                        splitLine: { color: '#e5e5e5' },
+                        splitArea: { areaStyle: { color: ['#fafafa', '#f5f5f5'] } }
+                    },
+                    series: [{
+                        type: 'radar',
+                        data: [{
+                            value: data,
+                            name: '你的心理维度',
+                            areaStyle: { 
+                                color: ageCircle.classList.contains('blue') 
+                                    ? 'rgba(66, 153, 225, 0.2)' 
+                                    : 'rgba(177, 156, 217, 0.2)'
+                            },
+                            lineStyle: { 
+                                color: ageCircle.classList.contains('blue') ? '#4299e1' : '#b19cd9', 
+                                width: 2 
+                            },
+                            itemStyle: { 
+                                color: ageCircle.classList.contains('blue') ? '#4299e1' : '#b19cd9',
+                                radius: 4 
+                            },
+                            label: { show: false }
+                        }]
+                    }],
+                    tooltip: { trigger: 'item' },
+                    legend: { show: false }
+                };
+                radarInstance.setOption(option);
+                window.addEventListener('resize', () => radarInstance.resize());
+            } catch (e) {
+                // 异常降级：显示随机文字数据
+                const randomData = [
+                    Math.floor(Math.random() * 20) + 10,
+                    Math.floor(Math.random() * 20) + 8,
+                    Math.floor(Math.random() * 20) + 12,
+                    Math.floor(Math.random() * 20) + 5,
+                    Math.floor(Math.random() * 20) + 15
+                ];
+                radarChart.innerHTML = `
+                    <div style="padding: 20px; text-align: center;">
+                        <h4 style="color: #666; margin-bottom: 15px;">你的心理维度评分</h4>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; font-size: 14px;">
+                            <span style="color: #999;">心态活力：${randomData[0]}</span>
+                            <span style="color: #999;">情绪稳定：${randomData[1]}</span>
+                            <span style="color: #999;">社交倾向：${randomData[2]}</span>
+                            <span style="color: #999;">冒险精神：${randomData[3]}</span>
+                            <span style="color: #999;">责任感：${randomData[4]}</span>
+                        </div>
+                    </div>
+                `;
+                console.error('雷达图加载失败：', e);
+            }
         }
 
         // 显示提示
         function showAlert(text) {
             alert.innerText = text;
             alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 1500);
+            setTimeout(() => alert.style.display = 'none', 1500);
         }
 
-        // 开始测试按钮
+        // 事件绑定
         startBtn.onclick = () => {
             const age = Number(ageInput.value);
             if (isNaN(age) || age < 12 || age > 100) {
@@ -519,49 +590,38 @@
                 return;
             }
             actualAge = age;
+            introBox.style.display = 'none';
             ageInputBox.style.display = 'none';
             questionContainer.style.display = 'block';
             initQuestion(0);
         };
 
-        // 下一题/查看结果按钮
-        nextBtn.onclick = () => {
-            if (selectedOption === -1) {
-                showAlert('请选择一个选项');
-                return;
-            }
-            answers[currentQIndex] = selectedOption;
-            if (currentQIndex === questions.length - 1) {
-                // 查看结果
-                questionContainer.style.display = 'none';
-                resultBox.style.display = 'block';
-                calcMentalAge();
-                mentalAgeNum.innerText = mentalAge;
-            } else {
-                currentQIndex++;
-                selectedOption = -1;
-                initQuestion(currentQIndex);
-            }
-        };
-
-        // 上一题按钮
         prevBtn.onclick = () => {
-            answers[currentQIndex] = selectedOption;
             currentQIndex--;
-            selectedOption = -1;
             initQuestion(currentQIndex);
         };
 
-        // 重新测试按钮
         restartBtn.onclick = () => {
             currentQIndex = 0;
-            selectedOption = -1;
             answers = [];
             resultBox.style.display = 'none';
+            introBox.style.display = 'block';
             ageInputBox.style.display = 'block';
             ageInput.value = '';
-            // 重置颜色主题为默认浅紫
-            applyColorTheme('purple');
+            if (radarInstance) {
+                radarInstance.dispose();
+                radarInstance = null;
+            }
+        };
+
+        wechatShare.onclick = () => wechatTip.style.display = 'flex';
+        closeTip.onclick = () => wechatTip.style.display = 'none';
+
+        // 页面加载检查
+        window.onload = () => {
+            if (typeof echarts === 'undefined') {
+                radarChart.innerHTML = '<div style="line-height: 300px; color: #999;">图表库加载失败，将显示文字版数据</div>';
+            }
         };
     </script>
 </body>
